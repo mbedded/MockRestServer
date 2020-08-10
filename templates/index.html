@@ -1,0 +1,37 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="/assets/style.css">
+</head>
+<body>
+
+<!--
+    Go example:
+
+    data := TodoPageData{
+        PageTitle: "My TODO list",
+        Todos: []Todo{
+            {Title: "Task 1", Done: false},
+            {Title: "Task 2", Done: true},
+            {Title: "Task 3", Done: true},
+        },
+    }
+
+    <h1>{{.PageTitle}}</h1>
+    <ul>
+        {{range .Todos}}
+            {{if .Done}}
+                <li class="done">{{.Title}}</li>
+            {{else}}
+                <li>{{.Title}}</li>
+            {{end}}
+        {{end}}
+    </ul>
+-->
+
+<h1>JMock API</h1>
+
+<p>This website is used to create and serve Mock-Data via REST</p>
+
+<a href="/create">Create new data</a>
+</body>
+</html>

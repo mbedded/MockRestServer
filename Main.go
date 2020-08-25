@@ -6,25 +6,31 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"html/template"
+	"log"
 	"net/http"
 )
 
 func main() {
 	router := mux.NewRouter()
-	manager := services.NewMockManager("temp")
+	mockManager := services.NewMockManager("temp.db")
 
-	router.HandleFunc("/raw/{id}", func(writer http.ResponseWriter, request *http.Request) {
+	router.HandleFunc("/raw/{key}", func(writer http.ResponseWriter, request *http.Request) {
 		vars := mux.Vars(request)
-		id := vars["id"]
+		key := vars["key"]
 
-		// Get text for key
+		result, err := mockManager.GetMock(key)
 
-		fmt.Fprintf(writer, "{\n\t\"id\": \"%s\"\n}", id)
+		if err != nil {
+			log.Fatalf("Error receiving data. %q", err)
+		}
+
+		fmt.Fprintf(writer, "%s", result.Content)
 	})
 
 	tmplIndex := template.Must(template.ParseFiles("templates/index.html"))
 	tmplCreate := template.Must(template.ParseFiles("templates/create.html"))
 
+	// todo: Split requests > router.HandleFunc(..).Methods("POST")
 	router.HandleFunc("/create", func(writer http.ResponseWriter, request *http.Request) {
 		if request.Method == http.MethodGet {
 			tmplCreate.Execute(writer, nil)
@@ -41,7 +47,7 @@ func main() {
 				Content: request.FormValue("content"),
 			}
 
-			result, err := manager.CreateMock(data)
+			result, err := mockManager.SaveMockToDatabase(data)
 
 			if err != nil {
 				// todo display error message to user
@@ -66,5 +72,6 @@ func main() {
 	})
 
 	http.ListenAndServe(":5050", router)
+	// todo: graceful shutdown? Close DB Connection
 
 }

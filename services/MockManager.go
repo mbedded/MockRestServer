@@ -55,7 +55,7 @@ func (m *MockManager) CloseConnection() {
 	}
 }
 
-func (m *MockManager) SaveMockToDatabase(data models.JsonMockPost) (id string, err error) {
+func (m *MockManager) SaveMockToDatabase(data models.JsonMockPost) (string, error) {
 	key := strings.TrimSpace(data.Key)
 	content := strings.TrimSpace(data.Content)
 
@@ -63,10 +63,11 @@ func (m *MockManager) SaveMockToDatabase(data models.JsonMockPost) (id string, e
 		key = uuid.New().String()
 	}
 
-	_, err = m.Database.Exec(SqlInsertMock, key, content)
+	_, err := m.Database.Exec(SqlInsertMock, key, content)
 
 	if err != nil {
 		log.Fatalf("Unable to insert data to database %q", err)
+		return "", err
 	}
 
 	return key, err

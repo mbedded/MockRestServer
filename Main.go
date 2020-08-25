@@ -24,7 +24,11 @@ func main() {
 			log.Fatalf("Error receiving data. %q", err)
 		}
 
-		fmt.Fprintf(writer, "%s", result.Content)
+		if result.Id <= 0 {
+			http.NotFound(writer, request)
+		} else {
+			fmt.Fprintf(writer, "%s", result.Content)
+		}
 	})
 
 	tmplIndex := template.Must(template.ParseFiles("templates/index.html"))
@@ -54,10 +58,10 @@ func main() {
 				return
 			}
 
-			//fmt.Printf("Key: %s | content: %s", data.Key, data.Content)
-			fmt.Printf("result: %s ", result)
+			log.Printf("Mock saved: key = %s", result)
 
-			return
+			// todo: display message "mock saved"
+			http.Redirect(writer, request, "/create", http.StatusSeeOther)
 		}
 
 		fmt.Fprintf(writer, "Method '%s' not allowed", request.Method)

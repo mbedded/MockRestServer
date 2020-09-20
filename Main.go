@@ -22,9 +22,10 @@ func main() {
 	_templates = InitializeTemplates()
 
 	// Routes for REST-API
-	_router.HandleFunc("/api/mock/{key}", getMock).Methods("GET")
+	_router.HandleFunc("/api/mock/key/{key}", getMock).Methods("GET")
 	_router.HandleFunc("/api/mock", createMock).Methods("POST")
 	_router.HandleFunc("/api/mock", updateMock).Methods("PUT")
+	_router.HandleFunc("/api/mock/all", getAllMocks).Methods("GET")
 
 	fileServer := http.FileServer(http.Dir("assets/"))
 	_router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fileServer))
@@ -33,6 +34,10 @@ func main() {
 
 	_router.HandleFunc("/create", func(writer http.ResponseWriter, request *http.Request) {
 		_templates["create"].Execute(writer, nil)
+	}).Methods("GET")
+
+	_router.HandleFunc("/showall", func(writer http.ResponseWriter, request *http.Request) {
+		_templates["showAll"].Execute(writer, nil)
 	}).Methods("GET")
 
 	_router.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
@@ -107,6 +112,20 @@ func getMock(writer http.ResponseWriter, request *http.Request) {
 	if result.Id == 0 {
 		writeBadRequest(fmt.Sprintf("No mock with id '%s' found", key), http.StatusBadRequest, writer)
 		return
+	}
+
+	data, err := json.Marshal(result)
+
+	writer.Header().Set("Content-Type", "text/plain")
+	writer.Write(data)
+}
+
+func getAllMocks(writer http.ResponseWriter, request *http.Request) {
+	result, err := _mockManager.GetAll()
+
+	if err != nil {
+		writeBadRequest(fmt.Sprintf("Error reading all mocks from database."), http.StatusBadRequest, writer)
+		log.Panicf("Error receiving data. %q", err)
 	}
 
 	data, err := json.Marshal(result)

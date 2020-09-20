@@ -19,6 +19,8 @@ const SqlCreateTable string = `CREATE TABLE Mocks (
 									value TEXT NOT NULL);`
 const SqlInsertMock string = `INSERT INTO Mocks(key, value) VALUES (?, ?);`
 const SqlSelectMockByKey string = `SELECT id, key, value FROM Mocks WHERE key = ?;`
+const SqlSelectAllMocks string = `SELECT id, key, value FROM Mocks ORDER BY key;`
+const SqlCountNumberOfMocks = `SELECT count(id) FROM Mocks;`
 const SqlCountByKey string = `SELECT COUNT(key) FROM Mocks WHERE key = ?;`
 const SqlUpdateMock string = `UPDATE Mocks SET value = ? WHERE key = ?;`
 
@@ -104,4 +106,38 @@ func (m *MockManager) GetMock(key string) (result models.JsonMockGet, err error)
 	}
 
 	return result, err
+}
+
+func (m *MockManager) GetAll() (result []models.JsonMockGet, err error) {
+	var numberOfMocks int
+	row := m.Database.QueryRow(SqlCountNumberOfMocks)
+	err = row.Scan(&numberOfMocks)
+
+	if err != nil {
+		log.Fatalf("Error counting Mocks in database. %q", err)
+	}
+
+	rows, err := m.Database.Query(SqlSelectAllMocks)
+
+	if err != nil {
+		log.Fatalf("Error reading all mocks from database. %q", err)
+	}
+
+	result = make([]models.JsonMockGet, numberOfMocks)
+	var index = 0
+
+	for rows.Next() && index < numberOfMocks {
+		item := models.JsonMockGet{}
+
+		err = rows.Scan(&item.Id, &item.Key, &item.Content)
+
+		if err != nil {
+			log.Fatalf("Error reading row from database. %q", err)
+		}
+
+		result[index] = item
+		index++
+	}
+
+	return result, nil
 }

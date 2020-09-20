@@ -37,7 +37,7 @@
 
         if (!!key) {
             $.ajax({
-                url: `/api/mock/${key}`,
+                url: `/api/mock/key/${key}`,
                 success: function (data) {
                     saveMethod = "PUT";
                     let jObject = JSON.parse(data);

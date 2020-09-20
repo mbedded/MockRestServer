@@ -17,13 +17,13 @@
         <th>Actions</th>
     </tr>
     </thead>
-    <tbody id="tableContent">
 
-    </tbody>
+    <tbody id="tableContent"></tbody>
 </table>
 
-<a href="/">Back to home</a>
-
+<p>
+    <a href="/">Back to home</a>
+</p>
 <script>
     var tableContent = $("#tableContent");
 
@@ -55,7 +55,7 @@
     }
 
     function deleteMock(key) {
-        var shouldBeDeleted = confirm(`do you want to delete: ${key}`)
+        var shouldBeDeleted = confirm(`Do you want to delete: ${key}`)
         if (shouldBeDeleted === false) {
             return;
         }

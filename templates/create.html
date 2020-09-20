@@ -43,7 +43,14 @@
                     let jObject = JSON.parse(data);
 
                     txtKey.val(jObject.Key);
+                    txtKey.prop('disabled', true);
+
                     txtContent.val(jObject.Content);
+                },
+                error: function (errMsg) {
+                    $.notify(`Mock with Key ${key} is not existing but you can create it now.`, "error");
+                    txtKey.val(key);
+                    txtContent.focus();
                 }
             });
         }

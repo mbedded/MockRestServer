@@ -23,6 +23,7 @@ func main() {
 
 	// Routes for REST-API
 	_router.HandleFunc("/api/mock/key/{key}", getMock).Methods("GET")
+	_router.HandleFunc("/api/mock/key/{key}", deleteMock).Methods("DELETE")
 	_router.HandleFunc("/api/mock", createMock).Methods("POST")
 	_router.HandleFunc("/api/mock", updateMock).Methods("PUT")
 	_router.HandleFunc("/api/mock/all", getAllMocks).Methods("GET")
@@ -110,7 +111,7 @@ func getMock(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if result.Id == 0 {
-		writeBadRequest(fmt.Sprintf("No mock with id '%s' found", key), http.StatusBadRequest, writer)
+		writeBadRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
 		return
 	}
 
@@ -169,6 +170,32 @@ func updateMock(writer http.ResponseWriter, request *http.Request) {
 	writer.WriteHeader(http.StatusAccepted)
 	writer.Header().Set("Content-Type", "text/plain")
 	writer.Write(data)
+}
+
+func deleteMock(writer http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+	key := vars["key"]
+
+	isExisting, err := _mockManager.ContainsKey(key)
+
+	if err != nil {
+		writeBadRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
+		log.Panicf("Error receiving data. %q", err)
+	}
+
+	if isExisting == false {
+		writeBadRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
+		return
+	}
+
+	err = _mockManager.DeleteMock(key)
+	if err != nil {
+		writeBadRequest("Error deleting the mock from database.", http.StatusBadRequest, writer)
+		log.Panicf("Error deleteing mock. %q", err)
+		return
+	}
+
+	writer.WriteHeader(http.StatusAccepted)
 }
 
 func writeBadRequest(errorMessage string, statusCode int, writer http.ResponseWriter) {

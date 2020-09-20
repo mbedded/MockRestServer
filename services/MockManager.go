@@ -23,6 +23,7 @@ const SqlSelectAllMocks string = `SELECT id, key, value FROM Mocks ORDER BY key;
 const SqlCountNumberOfMocks = `SELECT count(id) FROM Mocks;`
 const SqlCountByKey string = `SELECT COUNT(key) FROM Mocks WHERE key = ?;`
 const SqlUpdateMock string = `UPDATE Mocks SET value = ? WHERE key = ?;`
+const SqlDeleteMockByKey = `DELETE FROM Mocks WHERE key = ?;`
 
 func NewMockManager(connectionString string) *MockManager {
 	instance := &MockManager{
@@ -140,4 +141,9 @@ func (m *MockManager) GetAll() (result []models.JsonMockGet, err error) {
 	}
 
 	return result, nil
+}
+
+func (m *MockManager) DeleteMock(key string) error {
+	_, err := m.Database.Exec(SqlDeleteMockByKey, key)
+	return err
 }

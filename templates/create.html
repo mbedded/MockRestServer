@@ -28,12 +28,29 @@
 
 <script>
     $(function () {
-        var txtKey = $("#txtKey");
-        var txtContent = $("#txtContent");
+        let txtKey = $("#txtKey");
+        let txtContent = $("#txtContent");
+        let saveMethod = "POST";
+
+        let searchParams = new URLSearchParams(window.location.search);
+        let key = searchParams.get('key');
+
+        if (!!key) {
+            $.ajax({
+                url: `/api/mock/${key}`,
+                success: function (data) {
+                    saveMethod = "PUT";
+                    let jObject = JSON.parse(data);
+
+                    txtKey.val(jObject.Key);
+                    txtContent.val(jObject.Content);
+                }
+            });
+        }
 
         $("#btnSubmit").on("click", function () {
             $.ajax({
-                type: "POST",
+                type: saveMethod,
                 url: '/api/mock',
                 data: JSON.stringify({
                     "Key": txtKey.val(),
@@ -43,9 +60,11 @@
                     const result = JSON.parse(data);
                     $.notify(`Mock '${result.Key}' saved.`, "success");
 
-                    txtKey.val("");
-                    txtContent.val("");
-                    txtKey.focus();
+                    if (saveMethod === "POST") {
+                        txtKey.val("");
+                        txtContent.val("");
+                        txtKey.focus();
+                    }
                 },
                 error: function (errMsg) {
                     $.notify(`Error saving mock.\r\n${errMsg.responseText}`, "error");

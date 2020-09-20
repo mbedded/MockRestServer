@@ -20,7 +20,7 @@ const SqlCreateTable string = `CREATE TABLE Mocks (
 const SqlInsertMock string = `INSERT INTO Mocks(key, value) VALUES (?, ?);`
 const SqlSelectMockByKey string = `SELECT id, key, value FROM Mocks WHERE key = ?;`
 const SqlCountByKey string = `SELECT COUNT(key) FROM Mocks WHERE key = ?;`
-const SqlUpdateMock string = `UPDATE Mocks SET VALUE = ? WHERE KEY = ?;`
+const SqlUpdateMock string = `UPDATE Mocks SET value = ? WHERE key = ?;`
 
 func NewMockManager(connectionString string) *MockManager {
 	instance := &MockManager{
@@ -82,7 +82,7 @@ func (m *MockManager) ContainsKey(key string) (isExisting bool, err error) {
 }
 
 func (m *MockManager) UpdateMock(key string, content string) (err error) {
-	_, err = m.Database.Exec(SqlUpdateMock, key, content)
+	_, err = m.Database.Exec(SqlUpdateMock, content, key)
 
 	if err != nil {
 		log.Fatalf("Error counting keys in database. %q", err)

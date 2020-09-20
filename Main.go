@@ -145,7 +145,11 @@ func updateMock(writer http.ResponseWriter, request *http.Request) {
 		log.Panic("Unable to update item in database")
 	}
 
-	writer.WriteHeader(http.StatusNoContent)
+	data, err := json.Marshal(content)
+
+	writer.WriteHeader(http.StatusAccepted)
+	writer.Header().Set("Content-Type", "text/plain")
+	writer.Write(data)
 }
 
 func writeBadRequest(errorMessage string, statusCode int, writer http.ResponseWriter) {

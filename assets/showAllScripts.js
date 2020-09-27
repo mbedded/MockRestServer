@@ -28,13 +28,12 @@ function createTable(mocks) {
         var content = item.Content.substring(0, 20);
         var rowContent = `
                             <tr id=\"row_${key}\">
-                                <td>
-                                    <a href=\"/create?key=${key}\">${key}</a>
-                                </td>
+                                <td>${key}</td>
                                 <td>${content}</td>
                                 <td>
-                                    <a href=\"/raw/${key}\">Raw</a> ---
-                                    <input type=\"button\" onclick=\"deleteMock(\'${key}\')\" value=\"Delete\">
+                                    <a href=\"/raw/${key}\" target="_blank">Show raw content</a> |
+                                    <a href=\"/create?key=${key}\">Edit</a> |
+                                    <a class="text-danger" href="#" onclick=\"deleteMock(\'${key}\')\">Delete</a>
                                 </td>
                             </tr>`;
 

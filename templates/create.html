@@ -26,28 +26,32 @@
     </ul>
 </nav>
 <div class="container-fluid">
-    <h1>Create new Mock</h1>
+    <div class="row">
+        <div class="col">
+            <h1>Create new Mock</h1>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <form>
+                <label for="txtKey">Key</label>
 
-    <form>
-        <label for="txtKey">Key</label>
+                <br>
+                <input id="txtKey" type="text" placeholder="Your custom name for this mock (optional)"
+                       style="width: 500px;" autofocus>
 
-        <br>
-        <input id="txtKey" type="text" placeholder="Your custom name for this mock (optional)"
-               style="width: 500px;" autofocus>
+                <br>
+                <label for="txtContent">Content</label>
 
-        <br>
-        <label for="txtContent">Content</label>
+                <br>
+                <textarea id="txtContent" style="width: 500px;" rows="40"></textarea>
 
-        <br>
-        <textarea id="txtContent" style="width: 500px;" rows="40"></textarea>
+                <br>
+                <button id="btnSubmit" type="button">Save</button>
+            </form>
+        </div>
+    </div>
 
-        <br>
-        <button id="btnSubmit" type="button">Save</button>
-    </form>
 </div>
-
-<script>
-
-</script>
 </body>
 </html>

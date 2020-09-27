@@ -27,6 +27,4 @@ func main() {
 	_router.HandleFunc("/", _httpHandler.ShowTemplate).Methods("GET")
 
 	http.ListenAndServe(":5050", _router)
-	// todo: graceful shutdown? Close DB Connection
-
 }

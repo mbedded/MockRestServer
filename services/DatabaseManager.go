@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-type MockManager struct {
+type DatabaseManager struct {
 	ConnectionString string
 	Database         *sql.DB
 }
@@ -25,8 +25,8 @@ const SqlCountByKey string = `SELECT COUNT(key) FROM Mocks WHERE key = ?;`
 const SqlUpdateMock string = `UPDATE Mocks SET value = ? WHERE key = ?;`
 const SqlDeleteMockByKey = `DELETE FROM Mocks WHERE key = ?;`
 
-func NewMockManager(connectionString string) *MockManager {
-	instance := &MockManager{
+func NewDatabaseManager(connectionString string) *DatabaseManager {
+	instance := &DatabaseManager{
 		ConnectionString: connectionString,
 	}
 
@@ -35,7 +35,7 @@ func NewMockManager(connectionString string) *MockManager {
 	return instance
 }
 
-func (m *MockManager) InitializeDatabase() {
+func (m *DatabaseManager) InitializeDatabase() {
 	db, err := sql.Open("sqlite3", m.ConnectionString)
 
 	if err != nil {
@@ -51,13 +51,13 @@ func (m *MockManager) InitializeDatabase() {
 	}
 }
 
-func (m *MockManager) CloseConnection() {
+func (m *DatabaseManager) CloseConnection() {
 	if m.Database != nil {
 		m.Database.Close()
 	}
 }
 
-func (m *MockManager) SaveMockToDatabase(key string, content string) (string, error) {
+func (m *DatabaseManager) SaveMockToDatabase(key string, content string) (string, error) {
 	if len(key) == 0 {
 		key = uuid.New().String()
 	}
@@ -72,7 +72,7 @@ func (m *MockManager) SaveMockToDatabase(key string, content string) (string, er
 	return key, err
 }
 
-func (m *MockManager) ContainsKey(key string) (isExisting bool, err error) {
+func (m *DatabaseManager) ContainsKey(key string) (isExisting bool, err error) {
 	var count int
 	row := m.Database.QueryRow(SqlCountByKey, key)
 	err = row.Scan(&count)
@@ -84,7 +84,7 @@ func (m *MockManager) ContainsKey(key string) (isExisting bool, err error) {
 	return count >= 1, nil
 }
 
-func (m *MockManager) UpdateMock(key string, content string) (err error) {
+func (m *DatabaseManager) UpdateMock(key string, content string) (err error) {
 	_, err = m.Database.Exec(SqlUpdateMock, content, key)
 
 	if err != nil {
@@ -94,7 +94,7 @@ func (m *MockManager) UpdateMock(key string, content string) (err error) {
 	return err
 }
 
-func (m *MockManager) GetMock(key string) (result models.JsonMockGet, err error) {
+func (m *DatabaseManager) GetMock(key string) (result models.JsonMockGet, err error) {
 	row := m.Database.QueryRow(SqlSelectMockByKey, key)
 	err = row.Scan(&result.Id, &result.Key, &result.Content)
 
@@ -109,7 +109,7 @@ func (m *MockManager) GetMock(key string) (result models.JsonMockGet, err error)
 	return result, err
 }
 
-func (m *MockManager) GetAll() (result []models.JsonMockGet, err error) {
+func (m *DatabaseManager) GetAll() (result []models.JsonMockGet, err error) {
 	var numberOfMocks int
 	row := m.Database.QueryRow(SqlCountNumberOfMocks)
 	err = row.Scan(&numberOfMocks)
@@ -143,7 +143,7 @@ func (m *MockManager) GetAll() (result []models.JsonMockGet, err error) {
 	return result, nil
 }
 
-func (m *MockManager) DeleteMock(key string) error {
+func (m *DatabaseManager) DeleteMock(key string) error {
 	_, err := m.Database.Exec(SqlDeleteMockByKey, key)
 	return err
 }

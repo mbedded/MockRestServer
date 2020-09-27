@@ -16,7 +16,7 @@ import (
 
 var _templates map[string]*template.Template
 var _router = mux.NewRouter()
-var _mockManager = services.NewMockManager("temp.db")
+var _dbManager = services.NewDatabaseManager("mockRestServer.db")
 
 func main() {
 	_templates = InitializeTemplates()
@@ -52,7 +52,7 @@ func getMockContent(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	key := vars["key"]
 
-	result, err := _mockManager.GetMock(key)
+	result, err := _dbManager.GetMock(key)
 
 	if err != nil {
 		log.Fatalf("Error receiving data. %q", err)
@@ -83,7 +83,7 @@ func createMock(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	id, err := _mockManager.SaveMockToDatabase(content.Key, content.Content)
+	id, err := _dbManager.SaveMockToDatabase(content.Key, content.Content)
 
 	if err != nil {
 		writeBadRequest(fmt.Sprintf("Error saving data to database. %q", err),
@@ -103,7 +103,7 @@ func getMock(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	key := vars["key"]
 
-	result, err := _mockManager.GetMock(key)
+	result, err := _dbManager.GetMock(key)
 
 	if err != nil {
 		writeBadRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
@@ -122,7 +122,7 @@ func getMock(writer http.ResponseWriter, request *http.Request) {
 }
 
 func getAllMocks(writer http.ResponseWriter, request *http.Request) {
-	result, err := _mockManager.GetAll()
+	result, err := _dbManager.GetAll()
 
 	if err != nil {
 		writeBadRequest(fmt.Sprintf("Error reading all mocks from database."), http.StatusBadRequest, writer)
@@ -153,13 +153,13 @@ func updateMock(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	isExisting, err := _mockManager.ContainsKey(content.Key)
+	isExisting, err := _dbManager.ContainsKey(content.Key)
 	if isExisting == false {
 		writeBadRequest(fmt.Sprintf("No mock with key '%s' existing.", content.Key), http.StatusBadRequest, writer)
 		return
 	}
 
-	err = _mockManager.UpdateMock(content.Key, content.Content)
+	err = _dbManager.UpdateMock(content.Key, content.Content)
 
 	if err != nil {
 		log.Panic("Unable to update item in database")
@@ -176,7 +176,7 @@ func deleteMock(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	key := vars["key"]
 
-	isExisting, err := _mockManager.ContainsKey(key)
+	isExisting, err := _dbManager.ContainsKey(key)
 
 	if err != nil {
 		writeBadRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
@@ -188,7 +188,7 @@ func deleteMock(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	err = _mockManager.DeleteMock(key)
+	err = _dbManager.DeleteMock(key)
 	if err != nil {
 		writeBadRequest("Error deleting the mock from database.", http.StatusBadRequest, writer)
 		log.Panicf("Error deleteing mock. %q", err)

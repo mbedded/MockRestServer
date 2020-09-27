@@ -5,14 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"path/filepath"
+	"strings"
 )
 
 type HttpRequestHandler struct {
 	DatabaseManager *DatabaseManager
-	//Templates        map[string]*template.Template,
+	Templates       map[string]*template.Template
 }
 
 func NewHttpRequestHandler(dbManager *DatabaseManager) *HttpRequestHandler {
@@ -20,27 +23,49 @@ func NewHttpRequestHandler(dbManager *DatabaseManager) *HttpRequestHandler {
 		DatabaseManager: dbManager,
 	}
 
+	instance.Templates = initializeTemplates()
+
 	return instance
 }
 
-//func initializeTemplates() map[string]*template.Template {
-//	const extension = ".html"
-//	templates := make(map[string]*template.Template)
-//
-//	content, err := filepath.Glob("templates/*" + extension)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//
-//	for _, file := range content {
-//		filename := filepath.Base(file)
-//		filename = strings.Replace(filename, extension, "", 1)
-//
-//		templates[filename] = template.Must(template.ParseFiles(file))
-//	}
-//
-//	return templates
-//}
+func initializeTemplates() map[string]*template.Template {
+	const extension = ".html"
+	templates := make(map[string]*template.Template)
+
+	content, err := filepath.Glob("templates/*" + extension)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range content {
+		filename := filepath.Base(file)
+		filename = strings.Replace(filename, extension, "", 1)
+
+		templates[filename] = template.Must(template.ParseFiles(file))
+	}
+
+	return templates
+}
+
+func (handler *HttpRequestHandler) ShowTemplate(writer http.ResponseWriter, request *http.Request) {
+	path := request.URL.Path
+	templateName := getTemplateForPath(path)
+
+	handler.Templates[templateName].Execute(writer, nil)
+}
+
+func getTemplateForPath(path string) string {
+	switch path {
+	case "/create":
+		return "create"
+
+	case "/showall":
+		return "showAll"
+
+	default:
+		return "index"
+	}
+}
 
 func (handler *HttpRequestHandler) GetMock(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)

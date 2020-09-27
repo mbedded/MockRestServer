@@ -25,7 +25,9 @@ function createTable(mocks) {
         var item = mocks[index];
 
         var key = item.Key;
-        var content = item.Content.substring(0, 20);
+
+        var addition = (item.Content.length <= 20) ? "" : "…";
+        var content = item.Content.substring(0, 20) + addition;
         var rowContent = `
                             <tr id=\"row_${key}\">
                                 <td>${key}</td>

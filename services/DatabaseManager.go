@@ -15,7 +15,7 @@ type DatabaseManager struct {
 
 const SqlCreateTable string = `CREATE TABLE Mocks (
 									id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-									key VARCHAR(250) NOT NULL,
+									key VARCHAR(250) NOT NULL UNIQUE,
 									value TEXT NOT NULL);`
 const SqlInsertMock string = `INSERT INTO Mocks(key, value) VALUES (?, ?);`
 const SqlSelectMockByKey string = `SELECT id, key, value FROM Mocks WHERE key = ?;`
@@ -65,7 +65,7 @@ func (m *DatabaseManager) SaveMockToDatabase(key string, content string) (string
 	_, err := m.Database.Exec(SqlInsertMock, key, content)
 
 	if err != nil {
-		log.Fatalf("Unable to insert data to database %q", err)
+		log.Print("ERR: Unable to insert data to database %q", err)
 		return "", err
 	}
 
@@ -78,7 +78,8 @@ func (m *DatabaseManager) ContainsKey(key string) (isExisting bool, err error) {
 	err = row.Scan(&count)
 
 	if err != nil {
-		log.Fatalf("Error counting keys in database. %q", err)
+		log.Printf("ERR: Counting keys in database. %q", err)
+		return false, err
 	}
 
 	return count >= 1, nil
@@ -88,7 +89,7 @@ func (m *DatabaseManager) UpdateMock(key string, content string) (err error) {
 	_, err = m.Database.Exec(SqlUpdateMock, content, key)
 
 	if err != nil {
-		log.Fatalf("Error counting keys in database. %q", err)
+		log.Printf("Error counting keys in database. %q", err)
 	}
 
 	return err
@@ -103,7 +104,7 @@ func (m *DatabaseManager) GetMock(key string) (result models.JsonMockGet, err er
 	}
 
 	if err != nil {
-		log.Fatalf("Error loading data from database. %q", err)
+		log.Printf("Error loading data from database. %q", err)
 	}
 
 	return result, err
@@ -115,13 +116,15 @@ func (m *DatabaseManager) GetAll() (result []models.JsonMockGet, err error) {
 	err = row.Scan(&numberOfMocks)
 
 	if err != nil {
-		log.Fatalf("Error counting Mocks in database. %q", err)
+		log.Printf("Error counting Mocks in database. %q", err)
+		return nil, err
 	}
 
 	rows, err := m.Database.Query(SqlSelectAllMocks)
 
 	if err != nil {
-		log.Fatalf("Error reading all mocks from database. %q", err)
+		log.Printf("Error reading all mocks from database. %q", err)
+		return nil, err
 	}
 
 	result = make([]models.JsonMockGet, numberOfMocks)
@@ -133,14 +136,15 @@ func (m *DatabaseManager) GetAll() (result []models.JsonMockGet, err error) {
 		err = rows.Scan(&item.Id, &item.Key, &item.Content)
 
 		if err != nil {
-			log.Fatalf("Error reading row from database. %q", err)
+			log.Printf("Error reading row from database. %q", err)
+			break
 		}
 
 		result[index] = item
 		index++
 	}
 
-	return result, nil
+	return result, err
 }
 
 func (m *DatabaseManager) DeleteMock(key string) error {

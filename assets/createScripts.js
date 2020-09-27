@@ -19,7 +19,7 @@ $(function () {
                 txtContent.val(jObject.Content);
             },
             error: function (errMsg) {
-                $.notify(`Mock with Key ${key} is not existing but you can create it now.`, "error");
+                $.notify(`Mock with Key '${key}' is not existing but you can create it now.`, "warning");
                 txtKey.val(key);
                 txtContent.focus();
             }
@@ -45,6 +45,7 @@ $(function () {
                 }
             },
             error: function (errMsg) {
+                console.log(errMsg);
                 $.notify(`Error saving mock.\r\n${errMsg.responseText}`, "error");
             }
         })

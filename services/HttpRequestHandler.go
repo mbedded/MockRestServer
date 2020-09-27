@@ -74,12 +74,12 @@ func (handler *HttpRequestHandler) GetMock(writer http.ResponseWriter, request *
 	result, err := handler.DatabaseManager.GetMock(key)
 
 	if err != nil {
-		writeBadRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
+		writeHttpRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
 		log.Panicf("Error receiving data. %q", err)
 	}
 
 	if result.Id == 0 {
-		writeBadRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
+		writeHttpRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
 		return
 	}
 
@@ -96,18 +96,18 @@ func (handler *HttpRequestHandler) DeleteMock(writer http.ResponseWriter, reques
 	isExisting, err := handler.DatabaseManager.ContainsKey(key)
 
 	if err != nil {
-		writeBadRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
+		writeHttpRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
 		log.Panicf("Error receiving data. %q", err)
 	}
 
 	if isExisting == false {
-		writeBadRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
+		writeHttpRequest(fmt.Sprintf("No mock with key '%s' found", key), http.StatusBadRequest, writer)
 		return
 	}
 
 	err = handler.DatabaseManager.DeleteMock(key)
 	if err != nil {
-		writeBadRequest("Error deleting the mock from database.", http.StatusBadRequest, writer)
+		writeHttpRequest("Error deleting the mock from database.", http.StatusBadRequest, writer)
 		log.Panicf("Error deleteing mock. %q", err)
 		return
 	}
@@ -124,20 +124,27 @@ func (handler *HttpRequestHandler) CreateMock(writer http.ResponseWriter, reques
 	content.TrimFields()
 
 	if err != nil {
-		writeBadRequest("Unable to unmarshal Json", http.StatusBadRequest, writer)
+		writeHttpRequest("Unable to unmarshal Json", http.StatusBadRequest, writer)
 		return
 	}
 
 	if len(content.Content) == 0 {
-		writeBadRequest("Content must not be empty.", http.StatusBadRequest, writer)
+		writeHttpRequest("Content must not be empty.", http.StatusBadRequest, writer)
+		return
+	}
+
+	isExisting, err := handler.DatabaseManager.ContainsKey(content.Key)
+	if isExisting {
+		message := fmt.Sprintf("A mock with key  '%s' is already existing.", content.Key)
+		writeHttpRequest(message, http.StatusConflict, writer)
 		return
 	}
 
 	id, err := handler.DatabaseManager.SaveMockToDatabase(content.Key, content.Content)
 
 	if err != nil {
-		writeBadRequest(fmt.Sprintf("Error saving data to database. %q", err),
-			http.StatusInternalServerError, writer)
+		message := fmt.Sprintf("Error saving data to database. %q", err)
+		writeHttpRequest(message, http.StatusInternalServerError, writer)
 		return
 	}
 
@@ -158,18 +165,18 @@ func (handler *HttpRequestHandler) UpdateMock(writer http.ResponseWriter, reques
 	content.TrimFields()
 
 	if err != nil {
-		writeBadRequest("Unable to unmarshal Json", http.StatusBadRequest, writer)
+		writeHttpRequest("Unable to unmarshal Json", http.StatusBadRequest, writer)
 		return
 	}
 
 	if len(content.Content) == 0 || len(content.Key) == 0 {
-		writeBadRequest("Content and Key must not be empty.", http.StatusBadRequest, writer)
+		writeHttpRequest("Content and Key must not be empty.", http.StatusBadRequest, writer)
 		return
 	}
 
 	isExisting, err := handler.DatabaseManager.ContainsKey(content.Key)
 	if isExisting == false {
-		writeBadRequest(fmt.Sprintf("No mock with key '%s' existing.", content.Key), http.StatusBadRequest, writer)
+		writeHttpRequest(fmt.Sprintf("No mock with key '%s' existing.", content.Key), http.StatusBadRequest, writer)
 		return
 	}
 
@@ -190,7 +197,7 @@ func (handler *HttpRequestHandler) GetAllMocks(writer http.ResponseWriter, reque
 	result, err := handler.DatabaseManager.GetAll()
 
 	if err != nil {
-		writeBadRequest(fmt.Sprintf("Error reading all mocks from database."), http.StatusBadRequest, writer)
+		writeHttpRequest(fmt.Sprintf("Error reading all mocks from database."), http.StatusBadRequest, writer)
 		log.Panicf("Error receiving data. %q", err)
 	}
 
@@ -207,7 +214,10 @@ func (handler *HttpRequestHandler) GetMockContent(writer http.ResponseWriter, re
 	result, err := handler.DatabaseManager.GetMock(key)
 
 	if err != nil {
-		log.Fatalf("Error receiving data. %q", err)
+		message := fmt.Sprintf("Error receiving data. %q", err)
+		log.Print(message)
+		writeHttpRequest(message, http.StatusInternalServerError, writer)
+		return
 	}
 
 	if result.Id <= 0 {
@@ -217,7 +227,7 @@ func (handler *HttpRequestHandler) GetMockContent(writer http.ResponseWriter, re
 	}
 }
 
-func writeBadRequest(errorMessage string, statusCode int, writer http.ResponseWriter) {
+func writeHttpRequest(errorMessage string, statusCode int, writer http.ResponseWriter) {
 	writer.Header().Set("Content-Type", "text/plain")
 	writer.WriteHeader(statusCode)
 	writer.Write([]byte(errorMessage))

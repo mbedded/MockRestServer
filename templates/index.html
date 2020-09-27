@@ -1,19 +1,34 @@
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="/assets/bootstrap-4.5.2.min.css">
     <link rel="stylesheet" type="text/css" href="/assets/style.css">
 </head>
 <body>
-<h1>JMock API</h1>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">Home</a>
 
-<p>This website is used to create and serve Mock-Data via REST</p>
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            <a class="nav-link" href="/create">Create Mock</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/showall">Show all</a>
+        </li>
+    </ul>
 
-<p>
-    <a href="/create">Create new data</a>
-</p>
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="https://github.com/mbedded/MockRestServer" target="_blank">Project on Github</a>
+        </li>
+    </ul>
+</nav>
 
-<p>
-    <a href="/showall">Show all Mocks</a>
-</p>
+<div class="container-fluid">
+    <h1>JMock API</h1>
+
+    <p>This website is used to create and serve Mock-Data via REST</p>
+
+</div>
 
 </body>
 </html>

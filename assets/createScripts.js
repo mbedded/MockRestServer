@@ -1,6 +1,10 @@
 $(function () {
     let txtKey = $("#txtKey");
     let txtContent = $("#txtContent");
+    let headerPage = $("#headerPage");
+    let txtKeyHelp = $("#txtKeyHelp");
+    let btnSubmit = $("#btnSubmit");
+
     let saveMethod = "POST";
 
     let searchParams = new URLSearchParams(window.location.search);
@@ -14,10 +18,15 @@ $(function () {
                 saveMethod = "PUT";
                 originalObject = JSON.parse(data);
 
+                // Set inputs to current values
                 txtKey.val(originalObject.Key);
                 txtKey.prop('disabled', true);
-
                 txtContent.val(originalObject.Content);
+
+                // Update text of UI-Elements
+                headerPage.text("Update existing Mock");
+                btnSubmit.text("Save changes");
+                txtKeyHelp.hide();
             },
             error: function (errMsg) {
                 $.notify(`Mock with Key '${key}' is not existing but you can create it now.`, "warning");
@@ -27,7 +36,7 @@ $(function () {
         });
     }
 
-    $("#btnSubmit").on("click", function () {
+    btnSubmit.on("click", function () {
         $.ajax({
             type: saveMethod,
             url: '/api/mock',

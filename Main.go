@@ -26,12 +26,12 @@ func main() {
 	_router.HandleFunc("/api/mock/all", _httpHandler.GetAllMocks).Methods("GET")
 
 	fileServer := http.FileServer(http.Dir("assets/"))
-	_router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fileServer))
+	_router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fileServer)).Methods("GET")
 	_router.HandleFunc("/raw/{key}", _httpHandler.GetMockContent).Methods("GET")
 
 	_router.HandleFunc("/create", showTemplate).Methods("GET")
 	_router.HandleFunc("/showall", showTemplate).Methods("GET")
-	_router.HandleFunc("/", showTemplate)
+	_router.HandleFunc("/", showTemplate).Methods("GET")
 
 	http.ListenAndServe(":5050", _router)
 	// todo: graceful shutdown? Close DB Connection

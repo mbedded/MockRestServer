@@ -19,16 +19,23 @@ $(function () {
 });
 
 function createTable(mocks) {
-    var rows = [mocks.length];
+    let rows = [mocks.length];
 
-    for (let index = 0; index < mocks.length; index++) {
-        var item = mocks[index];
+    if (mocks.length <= 0) {
+        rows[0] = `<tr>
+                    <td class='text-muted' colspan='3'>
+                        There are no Mocks existing in the database but you can <a href="/create">create a new one</a>.
+                    </td>
+                   </tr>`
+    } else {
+        for (let index = 0; index < mocks.length; index++) {
+            let item = mocks[index];
 
-        var key = item.Key;
+            let key = item.Key;
 
-        var addition = (item.Content.length <= 20) ? "" : "…";
-        var content = item.Content.substring(0, 20) + addition;
-        var rowContent = `
+            let addition = (item.Content.length <= 20) ? "" : "…";
+            let content = item.Content.substring(0, 20) + addition;
+            let rowContent = `
                             <tr id=\"row_${key}\">
                                 <td>${key}</td>
                                 <td>${content}</td>
@@ -39,7 +46,8 @@ function createTable(mocks) {
                                 </td>
                             </tr>`;
 
-        rows[index] = rowContent;
+            rows[index] = rowContent;
+        }
     }
 
     var complete = rows.join();
@@ -47,7 +55,7 @@ function createTable(mocks) {
 }
 
 function deleteMock(key) {
-    var shouldBeDeleted = confirm(`Do you want to delete: ${key}`)
+    let shouldBeDeleted = confirm(`Do you want to delete: ${key}`)
     if (shouldBeDeleted === false) {
         return;
     }
@@ -58,7 +66,7 @@ function deleteMock(key) {
         success: function () {
             $.notify(`Mock '${key}' has been deleted.`, "success");
 
-            var rowId = `#row_${key}`;
+            let rowId = `#row_${key}`;
             $(rowId).remove();
         },
         error: function (errMsg) {

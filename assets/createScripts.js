@@ -5,18 +5,19 @@ $(function () {
 
     let searchParams = new URLSearchParams(window.location.search);
     let key = searchParams.get('key');
+    let originalObject;
 
     if (!!key) {
         $.ajax({
             url: `/api/mock/key/${key}`,
             success: function (data) {
                 saveMethod = "PUT";
-                let jObject = JSON.parse(data);
+                originalObject = JSON.parse(data);
 
-                txtKey.val(jObject.Key);
+                txtKey.val(originalObject.Key);
                 txtKey.prop('disabled', true);
 
-                txtContent.val(jObject.Content);
+                txtContent.val(originalObject.Content);
             },
             error: function (errMsg) {
                 $.notify(`Mock with Key '${key}' is not existing but you can create it now.`, "warning");
@@ -38,11 +39,8 @@ $(function () {
                 const result = JSON.parse(data);
                 $.notify(`Mock '${result.Key}' saved.`, "success");
 
-                if (saveMethod === "POST") {
-                    txtKey.val("");
-                    txtContent.val("");
-                    txtKey.focus();
-                }
+                originalObject = result;
+                resetForm();
             },
             error: function (errMsg) {
                 console.log(errMsg);
@@ -50,4 +48,21 @@ $(function () {
             }
         })
     });
+
+    $("#btnReset").on("click", function () {
+        resetForm();
+    });
+
+    function resetForm() {
+        if (saveMethod === "POST") {
+            txtKey.val("");
+            txtContent.val("");
+            txtKey.focus();
+        } else if (saveMethod === "PUT") {
+            txtContent.val(originalObject.Content);
+            txtContent.focus();
+        } else {
+            // Do nothing
+        }
+    }
 });

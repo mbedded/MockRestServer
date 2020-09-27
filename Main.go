@@ -8,14 +8,15 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"os"
 )
 
+var version = "DEVELOPMENT"
 var _args models.CommandArgs
 
 func main() {
-	flag.IntVar(&_args.HttpPort, "port", 8080, "HTTP-Port of the webserver")
-	flag.StringVar(&_args.DatabaseFile, "database", "mockRestServer.db", "Name of Sqlite-file")
-	flag.Parse()
+	InitializeFlags()
+	ShowVersionAndExitIfVersionArgIsUsed()
 
 	var router = mux.NewRouter()
 	var dbManager = services.NewDatabaseManager(_args.DatabaseFile)
@@ -37,5 +38,24 @@ func main() {
 	router.HandleFunc("/", httpHandler.ShowTemplate).Methods("GET")
 
 	log.Printf("Webserver will be startet at http://localhost:%d", _args.HttpPort)
-	http.ListenAndServe(fmt.Sprintf(":%d", _args.HttpPort), router)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", _args.HttpPort), router)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func InitializeFlags() {
+	flag.IntVar(&_args.HttpPort, "port", 8080, "HTTP-Port of the webserver")
+	flag.StringVar(&_args.DatabaseFile, "database", "mockRestServer.db", "Name of Sqlite-file")
+	flag.BoolVar(&_args.ShowVersion, "version", false, "Displays the version of this tool")
+	flag.Parse()
+}
+
+func ShowVersionAndExitIfVersionArgIsUsed() {
+	println("MockRestServer - Version: " + version)
+
+	if _args.ShowVersion {
+		os.Exit(0)
+	}
 }

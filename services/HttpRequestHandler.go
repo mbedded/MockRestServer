@@ -1,7 +1,7 @@
 package services
 
 import (
-	"./../models"
+	"../models"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -12,6 +12,7 @@ import (
 
 type HttpRequestHandler struct {
 	DatabaseManager *DatabaseManager
+	//Templates        map[string]*template.Template,
 }
 
 func NewHttpRequestHandler(dbManager *DatabaseManager) *HttpRequestHandler {
@@ -21,6 +22,25 @@ func NewHttpRequestHandler(dbManager *DatabaseManager) *HttpRequestHandler {
 
 	return instance
 }
+
+//func initializeTemplates() map[string]*template.Template {
+//	const extension = ".html"
+//	templates := make(map[string]*template.Template)
+//
+//	content, err := filepath.Glob("templates/*" + extension)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	for _, file := range content {
+//		filename := filepath.Base(file)
+//		filename = strings.Replace(filename, extension, "", 1)
+//
+//		templates[filename] = template.Must(template.ParseFiles(file))
+//	}
+//
+//	return templates
+//}
 
 func (handler *HttpRequestHandler) GetMock(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)

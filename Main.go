@@ -27,23 +27,35 @@ func main() {
 
 	fileServer := http.FileServer(http.Dir("assets/"))
 	_router.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", fileServer))
-
 	_router.HandleFunc("/raw/{key}", _httpHandler.GetMockContent).Methods("GET")
 
-	_router.HandleFunc("/create", func(writer http.ResponseWriter, request *http.Request) {
-		_templates["create"].Execute(writer, nil)
-	}).Methods("GET")
-
-	_router.HandleFunc("/showall", func(writer http.ResponseWriter, request *http.Request) {
-		_templates["showAll"].Execute(writer, nil)
-	}).Methods("GET")
-
-	_router.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		_templates["index"].Execute(writer, nil)
-	})
+	_router.HandleFunc("/create", showTemplate).Methods("GET")
+	_router.HandleFunc("/showall", showTemplate).Methods("GET")
+	_router.HandleFunc("/", showTemplate)
 
 	http.ListenAndServe(":5050", _router)
 	// todo: graceful shutdown? Close DB Connection
+
+}
+
+func showTemplate(writer http.ResponseWriter, request *http.Request) {
+	path := request.URL.Path
+	templateName := getTemplateForPath(path)
+
+	_templates[templateName].Execute(writer, nil)
+}
+
+func getTemplateForPath(path string) string {
+	switch path {
+	case "/create":
+		return "create"
+
+	case "/showall":
+		return "showAll"
+
+	default:
+		return "index"
+	}
 }
 
 func InitializeTemplates() map[string]*template.Template {

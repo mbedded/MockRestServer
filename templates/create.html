@@ -31,26 +31,24 @@
             <h1>Create new Mock</h1>
         </div>
     </div>
-    <div class="col">
-        <div class="row">
-            <form>
-                <label for="txtKey">Key</label>
-
-                <br>
-                <input id="txtKey" type="text" placeholder="Your custom name for this mock (optional)"
-                       style="width: 500px;" autofocus>
-
-                <br>
-                <label for="txtContent">Content</label>
-
-                <br>
-                <textarea id="txtContent" style="width: 500px;" rows="40"></textarea>
-
-                <br>
-                <button id="btnSubmit" type="button">Save</button>
-            </form>
+    <form>
+        <div class="form-group">
+            <label for="txtKey">Key</label>
+            <input type="text" class="form-control" id="txtKey" autofocus
+                   placeholder="Your custom name for this mock (optional)">
+            <small id="txtKeyHelp" class="form-text text-muted">
+                If the key is empty a new key will be generated automatically
+            </small>
         </div>
-    </div>
+
+        <div class="form-group">
+            <label for="txtContent">Content</label>
+            <textarea class="form-control" id="txtContent" rows="10"></textarea>
+        </div>
+
+        <button id="btnSubmit" class="btn btn-primary mr-5" type="button">Create Mock</button>
+        <button class="btn btn-light" type="reset">Reset form</button>
+    </form>
 
 </div>
 </body>

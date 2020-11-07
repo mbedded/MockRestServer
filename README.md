@@ -211,6 +211,9 @@ env GOOS=linux GOARCH=amd64 go build -o test_linux
 
 # Compile for Windows
 env GOOS=windows GOARCH=amd64 go build -o test_windows
+
+# Compile for MacOS
+env GOOS=darwin GOARCH=amd64 go build -o test_macos
 ```
 
 To add a version number you have to call `go build -ldflags "-X main.version=1.0"`.
@@ -218,10 +221,13 @@ A complete call would look like this:
 
 ```
 # Compile for Linux
-env GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=1.0" -o test_linux
+env GOOS=linux GOARCH=amd64 go build -ldflags "-X main.version=1.0" -o MockRestServer_linux_amd64
 
 # Compile for Windows
-env GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=1.0" -o test_windows
+env GOOS=windows GOARCH=amd64 go build -ldflags "-X main.version=1.0" -o MockRestServer_windows_amd64
+
+# Compile for MacOS
+env GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.version=1.0" -o MockRestServer_macos_amd64
 ```
 
 **Hint:** The name `main.version` is based on the variable in the *main.go*-file.

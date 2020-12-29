@@ -1,12 +1,12 @@
 package main
 
 import (
-	"./models"
-	"./services"
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
+	"mbedded/mockserver/models"
+	"mbedded/mockserver/services"
 	"net/http"
 	"os"
 )

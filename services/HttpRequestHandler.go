@@ -1,13 +1,13 @@
 package services
 
 import (
-	"../models"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"html/template"
 	"io/ioutil"
 	"log"
+	"mbedded/mockserver/models"
 	"net/http"
 	"path/filepath"
 	"strings"

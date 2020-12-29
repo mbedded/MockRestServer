@@ -1,11 +1,11 @@
 package services
 
 import (
-	"../models"
 	"database/sql"
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"mbedded/mockserver/models"
 )
 
 type DatabaseManager struct {
@@ -20,7 +20,7 @@ const SqlCreateTable string = `CREATE TABLE Mocks (
 const SqlInsertMock string = `INSERT INTO Mocks(key, value) VALUES (?, ?);`
 const SqlSelectMockByKey string = `SELECT id, key, value FROM Mocks WHERE key = ?;`
 const SqlSelectAllMocks string = `SELECT id, key, value FROM Mocks ORDER BY key;`
-const SqlCountNumberOfMocks = `SELECT count(id) FROM Mocks;`
+const SqlCountNumberOfMocks = `SELECT COUNT(id) FROM Mocks;`
 const SqlCountByKey string = `SELECT COUNT(key) FROM Mocks WHERE key = ?;`
 const SqlUpdateMock string = `UPDATE Mocks SET value = ? WHERE key = ?;`
 const SqlDeleteMockByKey = `DELETE FROM Mocks WHERE key = ?;`
